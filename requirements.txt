@@ -95,7 +95,6 @@ paramiko==2.4.2
 parso==0.3.1
 pickleshare==0.7.5
 Pillow==5.4.1
-pip-19.0.3
 plotly==3.4.2
 progress==1.4
 progressbar==2.5
@@ -143,7 +142,7 @@ testpath==0.4.2
 tornado==5.1.1
 tqdm==4.28.1
 traitlets==4.3.2
-typing==3.6.6   
+typing==3.6.6
 unicodecsv==0.14.1
 unittest2py3k==0.5.1
 unittest2six==0.0.0
