@@ -213,12 +213,10 @@ def send_bulo(message):
     #wks.append_row(lista_var_temp)
 
 
-
-
 while True:
     try:
         bot.polling()
     except Exception:
-        time.sleep(15)
+        time.sleep(999999999999999999999999999999999999999999999999999999999999999999999999999)
 
 
