@@ -23,7 +23,7 @@ def send_welcome(message):
     bot.reply_to(message, '¡Hola! \nTe damos la bienvenida al Buloblocker de Greenpeace España. Utilizando este bot, ya estás luchando contra la desinformación. \n¡Felicidades! ')
 
     bot.send_message(chat_id=message.chat.id,
-                     text="¿Qué quieres hacer?",
+                     text="....",
                      reply_markup=makeKeyboard(opciones),
                      parse_mode='HTML')
 
@@ -42,7 +42,7 @@ def send_help(message):
                           "En caso de querer recordar los comandos vuelve a usar /ayuda \n"
                           "Infórmate sobre esta iniciativa con /info\n"
                           "Mandanos un Bulo siguiendo los pasos de /bulo\n"
-                          "Echale un ojo a la guía sobre como enviar bulos de forma rápida /fasturl ")
+                          "Echale un ojo a la guía sobre como enviar bulos de forma rápida /fastbulo ")
 
 
 @bot.message_handler(commands=['fastbulo'])
@@ -71,8 +71,7 @@ def makeKeyboard(stringList):
     markup = types.InlineKeyboardMarkup()
 
     for key, value in stringList.items():
-        markup.add(types.InlineKeyboardButton(text=value, callback_data="['value', '" + value + "', '" + key + "']"),
-        #types.InlineKeyboardButton(text=crossIcon, callback_data="['key', '" + key + "']"))
+        markup.add(types.InlineKeyboardButton(text=value, callback_data="['value', '" + value + "', '" + key + "']"))
 
     return markup
 
@@ -108,7 +107,7 @@ def handle_query(call):
 
     fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales",
                "/5": "Lista de difusión"}
-    if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in [ "WhatsApp", "Telegram", "Familiar/conocido", "Otras redes sociales", "Lista de difusión"]:
+    if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in ["WhatsApp", "Telegram", "Familiar/conocido", "Otras redes sociales", "Lista de difusión"]:
         valueFromCallBack = ast.literal_eval(call.data)[1]
         keyFromCallBack = ast.literal_eval(call.data)[2]
         # bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
@@ -127,55 +126,19 @@ def handle_query(call):
                                                "Nuestro personal de campañas, lo estudiará para realizar la verificación. "
                                                "Puedes consultar nuestra biblioteca de desmentidos o Greenchecking. "
                                                "\n\nDifúndela y ayúdanos a parar la desinformación")
-    if call.data.startswith("['key'"):
-        keyFromCallBack = ast.literal_eval(call.data)[1]
-        del fuentes[keyFromCallBack]
-        fuentes = fuentes
-        bot.edit_message_text(chat_id=call.message.chat.id,
-                              text="respuesta",
-                              message_id=call.message.message_id,
-                              reply_markup=makeKeyboard(fuentes),
-                              parse_mode='HTML')
+    #if call.data.startswith("['key'"):
+    #    keyFromCallBack = ast.literal_eval(call.data)[1]
+    #    del fuentes[keyFromCallBack]
+    #    fuentes = fuentes
+    #    bot.edit_message_text(chat_id=call.message.chat.id,
+    #                          text="respuesta",
+    #                          message_id=call.message.message_id,
+    #                          reply_markup=makeKeyboard(fuentes),
+    #                          parse_mode='HTML')
 
     if opciones == 0:
-        opciones = {    "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
+        opciones = {"/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
 
-
-
-
-@bot.callback_query_handler(func=lambda call: True)
-def handle_query_fuente(call):
-    fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales", "/5": "Lista de difusión"}
-    if call.data.startswith("['value'"):
-        valueFromCallBack = ast.literal_eval(call.data)[1]
-        keyFromCallBack = ast.literal_eval(call.data)[2]
-        #bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
-        credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
-        gc = gspread.authorize(credentials)
-        wks = gc.open('Respuestas Formulario Muckrakers').sheet1
-        df = pd.DataFrame(wks.get_all_records())
-        print(df)
-        lista_var_temp = [call.message.chat.first_name, "usuarioTelegram", "Sin Info", call.message.text, "Sin especificar", "Sin especificar",
-                          valueFromCallBack, "Sin especificar", "Sin especificar", "Sin especificar",
-                          time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
-        wks.append_row(lista_var_temp)
-
-        bot.send_message(call.message.chat.id, "Gracias por enviarnos esta desinformación o contenido dudoso. \n"
-                                          "Nuestro personal de campañas, lo estudiará para realizar la verificación. "
-                                          "Puedes consultar nuestra biblioteca de desmentidos o Greenchecking. "
-                                          "\n\nDifúndela y ayúdanos a parar la desinformación")
-    if call.data.startswith("['key'"):
-        keyFromCallBack = ast.literal_eval(call.data)[1]
-        del fuentes[keyFromCallBack]
-        fuentes = fuentes
-        bot.edit_message_text(chat_id=call.message.chat.id,
-                              text="respuesta",
-                              message_id=call.message.message_id,
-                              reply_markup=makeKeyboard(fuentes),
-                              parse_mode='HTML')
-
-    if fuentes == 0:
-        fuentes = {"/hola": "Saluda!", "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
 
 
 @bot.message_handler(func=lambda msg: msg.text is not None and '://' in msg.text)
@@ -191,9 +154,6 @@ def send_bulo(message):
 
     bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste esta información?",
                      reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
-
-
-
 
 
     # FALTA AÑADIR LO DE SI SE QUIERE AÑADIR INFORMACIÓN EXTRA! IMPORTANTE!
