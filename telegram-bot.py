@@ -11,7 +11,7 @@ import telebot
 bot_token = '894065303:AAEnIsQHguU7bGVuPiF0DuYtRYyppa9ZjtQ'
 bot = telebot.TeleBot(token=bot_token)
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-opciones = {"/hola": "Saluda!", "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
+opciones = {"/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
 fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales", "/5": "Lista de difusión"}
 crossIcon = u"\u274C"
 
@@ -72,21 +72,21 @@ def makeKeyboard(stringList):
 
     for key, value in stringList.items():
         markup.add(types.InlineKeyboardButton(text=value, callback_data="['value', '" + value + "', '" + key + "']"),
-        types.InlineKeyboardButton(text=crossIcon, callback_data="['key', '" + key + "']"))
+        #types.InlineKeyboardButton(text=crossIcon, callback_data="['key', '" + key + "']"))
 
     return markup
 
 
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
-    opciones =  {"/hola": "Saluda!", "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!",
+    opciones =  { "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!",
                    "/fastbulo": "¿Mas rápido...?"}
     if call.data.startswith("['value'"):
         valueFromCallBack = ast.literal_eval(call.data)[1]
         keyFromCallBack = ast.literal_eval(call.data)[2]
         #bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
-        if keyFromCallBack.startswith("/hola"):
-            send_welcome(call.message)
+        #if keyFromCallBack.startswith("/hola"):
+        #    send_welcome(call.message)
         if keyFromCallBack.startswith("/bulo"):
             start_bulo(call.message)
         if keyFromCallBack.startswith("/info"):
@@ -96,19 +96,19 @@ def handle_query(call):
         if keyFromCallBack.startswith("/fastbulo"):
             send_fast_bulo(call.message)
 
-    if call.data.startswith("['key'"):
-        keyFromCallBack = ast.literal_eval(call.data)[1]
-        del opciones[keyFromCallBack]
-        opciones = opciones
-        bot.edit_message_text(chat_id=call.message.chat.id,
-                              text="respuesta",
-                              message_id=call.message.message_id,
-                              reply_markup=makeKeyboard(opciones),
-                              parse_mode='HTML')
+   # if call.data.startswith("['key'"):
+   #     keyFromCallBack = ast.literal_eval(call.data)[1]
+   #     del opciones[keyFromCallBack]
+   #     opciones = opciones
+   #     bot.edit_message_text(chat_id=call.message.chat.id,
+   #                           text="respuesta",
+   #                           message_id=call.message.message_id,
+   #                           reply_markup=makeKeyboard(opciones),
+   #                           parse_mode='HTML')
 
     fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales",
                "/5": "Lista de difusión"}
-    if call.data.startswith("['value'"):
+    if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in [ "WhatsApp", "Telegram", "Familiar/conocido", "Otras redes sociales", "Lista de difusión"]:
         valueFromCallBack = ast.literal_eval(call.data)[1]
         keyFromCallBack = ast.literal_eval(call.data)[2]
         # bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
@@ -138,7 +138,7 @@ def handle_query(call):
                               parse_mode='HTML')
 
     if opciones == 0:
-        opciones = {"/hola": "Saluda!", "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
+        opciones = {    "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
 
 
 
