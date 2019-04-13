@@ -1,4 +1,7 @@
 from __future__ import print_function
+
+import traceback
+
 import telebot
 import time
 import pprint as pp
@@ -149,10 +152,15 @@ def send_bulo(message):
     #wks.append_row(lista_var_temp)
 
 
-while True:
+def telegram_polling():
     try:
-        bot.polling()
-    except Exception:
-        time.sleep(999999999999999999999999999999999999999)
+        bot.polling(none_stop=True, timeout=60)
+    except:
+        traceback_error_string=traceback.format_exc()
+        with open("Error.Log", "a") as myfile:
+            myfile.write("\r\n\r\n" + time.strftime("%c")+"\r\n<<ERROR polling>>\r\n"+ traceback_error_string + "\r\n<<ERROR polling>>")
+        bot.stop_polling()
+        time.sleep(10)
+        telegram_polling()
 
 
