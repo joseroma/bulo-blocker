@@ -18,6 +18,15 @@ crossIcon = u"\u274C"
 
 print("Servidor iniciado!")
 
+def makeKeyboard(stringList):
+
+    markup = types.InlineKeyboardMarkup()
+
+    for key, value in stringList.items():
+        markup.add(types.InlineKeyboardButton(text=value, callback_data="['value', '" + value + "', '" + key + "']"))
+
+    return markup
+
 
 @bot.message_handler(commands=['hola', 'start'])
 def send_welcome(message):
@@ -67,16 +76,6 @@ def handle_command_adminwindow(message):
                      parse_mode='HTML')
 
 
-def makeKeyboard(stringList):
-
-    markup = types.InlineKeyboardMarkup()
-
-    for key, value in stringList.items():
-        markup.add(types.InlineKeyboardButton(text=value, callback_data="['value', '" + value + "', '" + key + "']"))
-
-    return markup
-
-
 @bot.callback_query_handler(func=lambda call: True)
 def handle_query(call):
     opciones =  { "/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!",
@@ -85,8 +84,6 @@ def handle_query(call):
         valueFromCallBack = ast.literal_eval(call.data)[1]
         keyFromCallBack = ast.literal_eval(call.data)[2]
         #bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
-        #if keyFromCallBack.startswith("/hola"):
-        #    send_welcome(call.message)
         if keyFromCallBack.startswith("/bulo"):
             start_bulo(call.message)
         if keyFromCallBack.startswith("/info"):
@@ -124,15 +121,6 @@ def handle_query(call):
                                                "Nuestro personal de campañas, lo estudiará para realizar la verificación. "
                                                "Puedes consultar nuestra biblioteca de desmentidos o Greenchecking. http://greenpeace.es/biblioteca-desmentidos  "
                                                "\n\nDifúndela y ayúdanos a parar la desinformación")
-    #if call.data.startswith("['key'"):
-    #    keyFromCallBack = ast.literal_eval(call.data)[1]
-    #    del fuentes[keyFromCallBack]
-    #    fuentes = fuentes
-    #    bot.edit_message_text(chat_id=call.message.chat.id,
-    #                          text="respuesta",
-    #                          message_id=call.message.message_id,
-    #                          reply_markup=makeKeyboard(fuentes),
-    #                          parse_mode='HTML')
 
 
 @bot.message_handler(func=lambda msg: msg.text is not None and '://' in msg.text)
