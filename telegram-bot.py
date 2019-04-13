@@ -164,3 +164,4 @@ def telegram_polling():
         telegram_polling()
 
 
+telegram_polling()
