@@ -1,6 +1,7 @@
 from __future__ import print_function
 import telebot
 import time
+import pprint as pp
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
 import pandas as pd
@@ -12,7 +13,7 @@ bot_token = '894065303:AAEnIsQHguU7bGVuPiF0DuYtRYyppa9ZjtQ'
 bot = telebot.TeleBot(token=bot_token)
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 opciones = {"/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
-fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales", "/5": "Lista de difusión"}
+fuentes = {"/1": "WhatsApp familiar", "/2": "Lista de difusion", "/3": "Telegram", "/4": "Otras redes sociales"}
 crossIcon = u"\u274C"
 
 print("Servidor iniciado!")
@@ -48,9 +49,9 @@ def send_help(message):
 @bot.message_handler(commands=['fastbulo'])
 def send_fast_bulo(message):
     bot.reply_to(message, "Si tienes pensado hablarme a menudo, esto te interesa:\n"
-                          "Puedes saltarte muchos pasos a la hora de enviar URL, y que me puedas mandar enlaces mucho mas rápido. \n"
-                          "De hecho, puedes saltarte el saludo (/hola), incluso decirme que vas a mandar una url (/url) y simplemente mandármela. "
-                          "Pruébalo, ¡ya verás que rápido! \n")
+                          "Puedes saltarte muchos pasos a la hora de enviar un enlac, y que me puedas mandar contenido dudoso mucho mas rápido. \n"
+                          "De hecho, puedes saltarte el saludo (/hola), incluso decirme que vas a mandar un enlace (/bulo) y simplemente mandármela. "
+                          "Adelante, manda el enlace, ¡ya verás que rápido! \n")
 
 
 @bot.message_handler(commands=['bulo'])
@@ -105,26 +106,23 @@ def handle_query(call):
    #                           reply_markup=makeKeyboard(opciones),
    #                           parse_mode='HTML')
 
-    fuentes = {"1": "WhatsApp", "/2": "Telegram", "/3": "Familiar/conocido", "/4": "Otras redes sociales",
-               "/5": "Lista de difusión"}
-    if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in ["WhatsApp", "Telegram", "Familiar/conocido", "Otras redes sociales", "Lista de difusión"]:
+    if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in ["WhatsApp familiar", "Lista de difusion", "Telegram", "Otras redes sociales"]:
+
         valueFromCallBack = ast.literal_eval(call.data)[1]
-        keyFromCallBack = ast.literal_eval(call.data)[2]
-        # bot.answer_callback_query(callback_query_id=call.id, show_alert=True, text="You Clicked " + valueFromCallBack + " and key is " + keyFromCallBack)
         credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
         gc = gspread.authorize(credentials)
-        wks = gc.open('Respuestas Formulario Muckrakers').sheet1
+        wks = gc.open('Respuestas Formulario Muckrakers').worksheet("BuloBlockerFarmer")
         df = pd.DataFrame(wks.get_all_records())
         print(df)
-        lista_var_temp = [call.message.chat.first_name, "usuarioTelegram", "Sin Info", call.message.text,
+        lista_var_temp = [call.message.chat.first_name + call.message.chat.last_name, call.message.chat.id,  call.message.text,
                           "Sin especificar", "Sin especificar",
-                          valueFromCallBack, "Sin especificar", "Sin especificar", "Sin especificar",
+                          valueFromCallBack, "Sin especificar", "Sin especificar",
                           time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
         wks.append_row(lista_var_temp)
-
+        print(call.message)
         bot.send_message(call.message.chat.id, "Gracias por enviarnos esta desinformación o contenido dudoso. \n"
                                                "Nuestro personal de campañas, lo estudiará para realizar la verificación. "
-                                               "Puedes consultar nuestra biblioteca de desmentidos o Greenchecking. "
+                                               "Puedes consultar nuestra biblioteca de desmentidos o Greenchecking. http://greenpeace.es/biblioteca-desmentidos  "
                                                "\n\nDifúndela y ayúdanos a parar la desinformación")
     #if call.data.startswith("['key'"):
     #    keyFromCallBack = ast.literal_eval(call.data)[1]
@@ -136,27 +134,17 @@ def handle_query(call):
     #                          reply_markup=makeKeyboard(fuentes),
     #                          parse_mode='HTML')
 
-    if opciones == 0:
-        opciones = {"/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
-
-
 
 @bot.message_handler(func=lambda msg: msg.text is not None and '://' in msg.text)
 def send_bulo(message):
-    credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
-    gc = gspread.authorize(credentials)
-    wks = gc.open('Respuestas Formulario Muckrakers').sheet1
-    df = pd.DataFrame(wks.get_all_records())
-    nombr_temp = message.chat.id
-    lista_var_temp = [nombr_temp, "usuarioTelegram", "Sin Info", message.text, "Sin especificar", "Sin especificar", "Sin especificar", "Sin especificar", "Sin especificar", "Sin especificar",time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
 
     bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
 
-    bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste esta información?",
+    bot.send_message(chat_id=message.chat.id, text=message.text,
                      reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
 
 
-    # FALTA AÑADIR LO DE SI SE QUIERE AÑADIR INFORMACIÓN EXTRA! IMPORTANTE!
+    # SI SE PUEDE AÑADIR MAS CAMPOS A FORMULARIO
 
     # Comprobamos si hemos el fact check de esta noticia
     #if any(message.text in string for string in df['ENLACE A LA PLATAFORMA DONDE ESTÁ PUBLICADA LA NOTICIA']):
@@ -177,6 +165,6 @@ while True:
     try:
         bot.polling()
     except Exception:
-        time.sleep(999999999999999999999999999999999999999999999999999999999999999999999999999)
+        time.sleep(999999999999999999999999999999999999999)
 
 
