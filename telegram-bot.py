@@ -111,7 +111,8 @@ def handle_query(call):
         valueFromCallBack = ast.literal_eval(call.data)[1]
         credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
         gc = gspread.authorize(credentials)
-        wks = gc.open('Respuestas Formulario Muckrakers').worksheet("BuloBlockerFarmer")
+        wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos recibidos del bot"
+                                                                    "")
         df = pd.DataFrame(wks.get_all_records())
         print(df)
         lista_var_temp = [call.message.chat.first_name + call.message.chat.last_name, call.message.chat.id,  call.message.text,
