@@ -115,7 +115,7 @@ def handle_query(call):
                                                                     "")
         df = pd.DataFrame(wks.get_all_records())
         print(df)
-        lista_var_temp = [call.message.chat.first_name + call.message.chat.last_name, call.message.chat.id,  call.message.text,
+        lista_var_temp = [call.message.chat.first_name +" "+ call.message.chat.last_name, call.message.chat.id,  call.message.text,
                           "Sin especificar", "Sin especificar",
                           valueFromCallBack, "Sin especificar", "Sin especificar",
                           time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
