@@ -111,8 +111,7 @@ def handle_query(call):
         valueFromCallBack = ast.literal_eval(call.data)[1]
         credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
         gc = gspread.authorize(credentials)
-        wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos recibidos del bot"
-                                                                    "")
+        wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos recibidos del bot")
         df = pd.DataFrame(wks.get_all_records())
         print(df)
         lista_var_temp = [call.message.chat.first_name +" "+ call.message.chat.last_name, call.message.chat.id,  call.message.text,
@@ -130,27 +129,32 @@ def handle_query(call):
 @bot.message_handler(func=lambda msg: msg.text is not None and '://' in msg.text)
 def send_bulo(message):
 
-    bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
+    # PRIMERO VAMOS A REVISAR
+    credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
+    gc = gspread.authorize(credentials)
+    wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos desmentidos")
+    df = pd.DataFrame(wks.get_all_records())
 
-    bot.send_message(chat_id=message.chat.id, text=message.text,
-                     reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
+    if df['enlace del contenido'].isin(message.text):
+        desmentido_rows = df[df['enlace del contenido'].isin(message.text)]
+        desmentido = list(desmentido_rows["enlace del desmentido"])[0]
+        #Comentar que este enlace ya lo recibimos y que nos diga como lo ha recibido
+        bot.send_message(message.chat.id, "En enlace proporcionado contiene desinformación que ya ha sido desmentida en nuestro Greenchecking\n"
+                                          "Revisa nuestro desmentido en: \n"+ desmentido)
+        bot.send_message(chat_id=message.chat.id, text="No te olvides de indicarnos cómo recibiste el enlace\n" + message.text,
+                         reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
+    else:
+        bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
+        bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste el enlace?\n" + message.text,
+                         reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
 
 
-    # SI SE PUEDE AÑADIR MAS CAMPOS A FORMULARIO
+
 
     # Comprobamos si hemos el fact check de esta noticia
     #if any(message.text in string for string in df['ENLACE A LA PLATAFORMA DONDE ESTÁ PUBLICADA LA NOTICIA']):
     #    bot.reply_to(message, "Gracias por tu colaboración este ya lo tenemos")
     #    print("Gracias por tu colaboración este ya lo tenemos")
-    #else:
-    #    parts = message.text.split("//")
-    #    partes = parts[1].split(".")
-    #    if partes[0] == "www":
-    #        fuente = partes[1]
-    #    else:
-    #        fuente = partes[0]
-
-    #wks.append_row(lista_var_temp)
 
 
 def telegram_polling():
