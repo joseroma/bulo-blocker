@@ -128,24 +128,26 @@ def handle_query(call):
 
 @bot.message_handler(func=lambda msg: msg.text is not None and '://' in msg.text)
 def send_bulo(message):
-
+    """
     # PRIMERO VAMOS A REVISAR
     credentials = ServiceAccountCredentials.from_json_keyfile_name('BuloBlocker-451d2c1b42d2.json', scope)
     gc = gspread.authorize(credentials)
     wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos desmentidos")
     df = pd.DataFrame(wks.get_all_records())
 
-    if df['enlace del contenido'].isin(message.text):
-        desmentido_rows = df[df['enlace del contenido'].isin(message.text)]
+    if any(df['enlace del contenido'].isin([message.text])):
+        desmentido_rows = df[df['enlace del contenido'].isin([message.text])]
         desmentido = list(desmentido_rows["enlace del desmentido"])[0]
         #Comentar que este enlace ya lo recibimos y que nos diga como lo ha recibido
         bot.send_message(message.chat.id, "En enlace proporcionado contiene desinformación que ya ha sido desmentida en nuestro Greenchecking\n"
-                                          "Revisa nuestro desmentido en: \n"+ desmentido)
-        bot.send_message(chat_id=message.chat.id, text="No te olvides de indicarnos cómo recibiste el enlace\n" + message.text,
+                                          "Revisa nuestro desmentido en: \n"+ desmentido + "\n\nNo te olvides de indicarnos cómo recibiste el enlace\n")
+        bot.send_message(chat_id=message.chat.id, text= message.text,
                          reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
     else:
-        bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
-        bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste el enlace?\n" + message.text,
+    """
+    bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
+
+    bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste el enlace?\n" + message.text,
                          reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
 
 
