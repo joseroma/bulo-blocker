@@ -145,9 +145,9 @@ def send_bulo(message):
                          reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
     else:
     """
-    bot.send_message(message.chat.id, "¿Quieres ayudarnos?")
+    bot.send_message(message.chat.id, "¿Quieres ayudarnos?\n\n¿Cómo recibiste el enlace?\n")
 
-    bot.send_message(chat_id=message.chat.id, text="¿Cómo recibiste el enlace?\n" + message.text,
+    bot.send_message(chat_id=message.chat.id, text=message.text,
                          reply_markup=makeKeyboard(fuentes), parse_mode='HTML')
 
 
