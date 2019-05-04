@@ -114,10 +114,24 @@ def handle_query(call):
         wks = gc.open('Respuestas Formulario Muckrakers').worksheet("bulos recibidos del bot")
         df = pd.DataFrame(wks.get_all_records())
         print(df)
-        lista_var_temp = [call.message.chat.first_name +" "+ call.message.chat.last_name, call.message.chat.id,  call.message.text,
+        try:
+            lista_var_temp = [call.message.chat.first_name +" "+ call.message.chat.last_name, call.message.chat.id,  call.message.text,
                           "Sin especificar", "Sin especificar",
                           valueFromCallBack, "Sin especificar", "Sin especificar",
                           time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
+        except:
+            try:
+                lista_var_temp = [call.message.chat.first_name + " " + "Sin especificar",
+                                  call.message.chat.id, call.message.text,
+                                  "Sin especificar", "Sin especificar",
+                                  valueFromCallBack, "Sin especificar", "Sin especificar",
+                                  time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
+            except:
+                lista_var_temp = ["Sin especificar" + " " + "Sin especificar",
+                                  call.message.chat.id, call.message.text,
+                                  "Sin especificar", "Sin especificar",
+                                  valueFromCallBack, "Sin especificar", "Sin especificar",
+                                  time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
         wks.append_row(lista_var_temp)
         print(call.message)
         bot.send_message(call.message.chat.id, "Gracias por enviarnos esta desinformación o contenido dudoso. \n"
@@ -152,7 +166,6 @@ def send_bulo(message):
 
 
 
-
     # Comprobamos si hemos el fact check de esta noticia
     #if any(message.text in string for string in df['ENLACE A LA PLATAFORMA DONDE ESTÁ PUBLICADA LA NOTICIA']):
     #    bot.reply_to(message, "Gracias por tu colaboración este ya lo tenemos")
@@ -160,15 +173,17 @@ def send_bulo(message):
 
 
 def telegram_polling():
+
     try:
-        bot.polling(none_stop=True, timeout=60)
+        bot.polling()#none_stop=True, timeout=60)
     except:
         traceback_error_string=traceback.format_exc()
         with open("Error.Log", "a") as myfile:
             myfile.write("\r\n\r\n" + time.strftime("%c")+"\r\n<<ERROR polling>>\r\n"+ traceback_error_string + "\r\n<<ERROR polling>>")
         bot.stop_polling()
-        time.sleep(10)
+        #time.sleep(10)
         telegram_polling()
 
 
 telegram_polling()
+
