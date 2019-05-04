@@ -121,7 +121,7 @@ def handle_query(call):
                           time.strftime("%d/%m/%y") + " " + time.strftime("%H:%M:%S")]
         except:
             try:
-                lista_var_temp = [call.message.chat.first_name + " " + "Sin especificar",
+                lista_var_temp = [call.message.chat.first_name ,
                                   call.message.chat.id, call.message.text,
                                   "Sin especificar", "Sin especificar",
                                   valueFromCallBack, "Sin especificar", "Sin especificar",
@@ -179,7 +179,7 @@ def telegram_polling():
     except:
         traceback_error_string=traceback.format_exc()
         with open("Error.Log", "a") as myfile:
-            myfile.write("\r\n\r\n" + time.strftime("%c")+"\r\n<<ERROR polling>>\r\n"+ traceback_error_string + "\r\n<<ERROR polling>>")
+            myfile.write("\r\n\r\n" + time.strftime("%c")+"\r\n<<ERROR polling>>\r\n" + traceback_error_string + "\r\n<<ERROR polling>>")
         bot.stop_polling()
         #time.sleep(10)
         telegram_polling()
