@@ -12,7 +12,7 @@ from telebot import types
 import ast
 import time
 import telebot
-bot_token = '894065303:AAEnIsQHguU7bGVuPiF0DuYtRYyppa9ZjtQ'
+bot_token = 'XXXXXX'
 bot = telebot.TeleBot(token=bot_token)
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
 opciones = {"/bulo": "Enviar Bulo", "/info": "Información", "/ayuda": "Ayuda!", "/fastbulo": "¿Mas rápido...?"}
@@ -96,15 +96,6 @@ def handle_query(call):
         if keyFromCallBack.startswith("/fastbulo"):
             send_fast_bulo(call.message)
 
-   # if call.data.startswith("['key'"):
-   #     keyFromCallBack = ast.literal_eval(call.data)[1]
-   #     del opciones[keyFromCallBack]
-   #     opciones = opciones
-   #     bot.edit_message_text(chat_id=call.message.chat.id,
-   #                           text="respuesta",
-   #                           message_id=call.message.message_id,
-   #                           reply_markup=makeKeyboard(opciones),
-   #                           parse_mode='HTML')
 
     if call.data.startswith("['value'") and ast.literal_eval(call.data)[1] in ["WhatsApp familiar", "Lista de difusion", "Telegram", "Otras redes sociales"]:
 
